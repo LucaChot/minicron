@@ -62,59 +62,41 @@ int main() {
         return 1;
     }
 
-    // Output the parsed data
-    //std::cout << "\nJobs parsed:\n";
-    //for (const auto &job : jobs) {
-        //std::cout << "Minute: " << job.minute
-                  //<< ", Hour: " << job.hour
-                  //<< ", File: " << job.filename << "\n";
-    //}
-
-    std::cout << "Final time: "
-              << (hour < 10 ? "0" : "") << hour << ":"
-              << (minute < 10 ? "0" : "") << minute << "\n";
-
     for (auto& job : jobs) {
+        std::string day = " today ";
         if (job.hour.has_value()) {
             if (job.hour < hour) {
                 if (!job.minute.has_value()) {
                     job.minute = 0;
                 }
-                std::cout << job.hour.value() << ":" << job.minute.value() << " tomorrow - " << job.filename << "\n";
-                continue;
-            }
-            if (job.hour > hour) {
+                day = " tomorrow ";
+            } else if (job.hour > hour) {
                 if (!job.minute.has_value()) {
                     job.minute = 0;
                 }
-                std::cout << job.hour.value() << ":" << job.minute.value() << " today - " << job.filename << "\n";
-                continue;
-            }
-            if (!job.minute.has_value()) {
-                job.minute = minute;
-            }
-            if (job.minute < minute) {
-                std::cout << job.hour.value() << ":" << job.minute.value() << " tomorrow - " << job.filename << "\n";
-
             } else {
-                std::cout << job.hour.value() << ":" << job.minute.value() << " today - " << job.filename << "\n";
+                if (!job.minute.has_value()) {
+                    job.minute = minute;
+                }
+                if (job.minute < minute) {
+                    day = " tomorrow ";
+                }
             }
         } else {
             if (!job.minute.has_value()) {
                 job.minute = minute;
             }
             if (job.minute < minute) {
-                std::string day = " today ";
                 job.hour = hour + 1;
                 if (job.hour == 24) {
                     job.hour = 0;
                     day = " tomorrow ";
                 }
-                std::cout << job.hour.value() << ":" << job.minute.value() << day << job.filename << "\n";
             } else {
-                std::cout << hour << ":" << job.minute.value() << " today - " << job.filename << "\n";
+                job.hour = hour;
             }
         }
+        std::cout << job.hour.value() << ":" << (job.minute.value() < 10 ? "0" : "") << job.minute.value() << day << "- " << job.filename << "\n";
     }
 
     return 0;
