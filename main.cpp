@@ -6,34 +6,33 @@
 
 // Uses std::nullopt to represent * case
 struct Job {
-    std::optional<int> minute;
-    std::optional<int> hour;
+    int minute;
+    int hour;
     std::string filename;
 };
 
 // Parses input string and creates corresponding Job struct
 // Returns optional type in the case when the string can't be parse
-std::optional<Job> parse_job(std::string line){
+int parse_job(std::string line, Job& job){
     // Use istringstream to parse the job line
     std::istringstream iss(line);
     std::string temp_minute, temp_hour, temp_filename;
     if ((iss >> temp_minute >> temp_hour >> temp_filename)) {
-        Job job;
         if (temp_minute[0] == '*') {
-            job.minute = std::nullopt;
+            job.minute = 60;
         } else {
             job.minute = std::stoi(temp_minute);
         }
         if (temp_hour[0] == '*') {
-            job.hour = std::nullopt;
+            job.hour = 24;
         } else {
             job.hour = std::stoi(temp_hour);
         }
         job.filename = temp_filename;
-        return job;
+        return 0;
     }
     std::cerr << "Error parsing job line: " << line << std::endl;
-    return std::nullopt;
+    return 1;
 }
 
 int main(int argc, char* argv[]) {
@@ -62,27 +61,26 @@ int main(int argc, char* argv[]) {
     // Loops over input buffer, parsing over each line and calculating the next
     // time the job will run
     while (std::getline(std::cin, line)) {
-        std::optional<Job> parsed_job = parse_job(line);
+        Job job;
         // Skips if line fails to parse
-        if (!parsed_job.has_value()) {
+        if (parse_job(line, job)) {
             continue;
         }
-        Job job = parsed_job.value();
 
         // Handles different cases
         std::string day = " today ";
-        if (job.hour.has_value()) {
+        if (job.hour != 24) {
             if (job.hour < hour) {
-                if (!job.minute.has_value()) {
+                if (job.minute == 60) {
                     job.minute = 0;
                 }
                 day = " tomorrow ";
             } else if (job.hour > hour) {
-                if (!job.minute.has_value()) {
+                if (job.minute == 60) {
                     job.minute = 0;
                 }
             } else {
-                if (!job.minute.has_value()) {
+                if (job.minute == 60) {
                     job.minute = minute;
                 }
                 if (job.minute < minute) {
@@ -90,7 +88,7 @@ int main(int argc, char* argv[]) {
                 }
             }
         } else {
-            if (!job.minute.has_value()) {
+            if (job.minute == 60) {
                 job.minute = minute;
             }
             if (job.minute < minute) {
@@ -104,8 +102,8 @@ int main(int argc, char* argv[]) {
             }
         }
         // Outputs the next time the job will run
-        std::cout << job.hour.value() << ":"
-                  << (job.minute.value() < 10 ? "0" : "") << job.minute.value()
+        std::cout << job.hour << ":"
+                  << (job.minute < 10 ? "0" : "") << job.minute
                   << day << "- " << job.filename << std::endl;
     }
 
