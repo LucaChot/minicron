@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -14,6 +15,7 @@ struct Job {
 // Returns optional type in the case when the string can't be parse
 int parse_job(std::string line, Job& job){
     // Use istringstream to parse the job line
+    try {
     std::istringstream iss(line);
     std::string temp_minute, temp_hour, temp_filename;
     if ((iss >> temp_minute >> temp_hour >> temp_filename)) {
@@ -30,8 +32,12 @@ int parse_job(std::string line, Job& job){
         job.filename = temp_filename;
         return 0;
     }
+    throw std::invalid_argument("invalid argument");
+    }
+    catch (...) {
     std::cerr << "Error parsing job line: " << line << std::endl;
     return 1;
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -66,38 +72,43 @@ int main(int argc, char* argv[]) {
             continue;
         }
 
-        // Handles different cases
+        // Handles the every hour case
+        if (job.hour == 24) {
+            job.hour = hour;
+
+            // If every minute -> run now
+            if (job.minute == 60) {
+                job.minute = minute;
+            }
+
+            // If we missed the minute -> run next hour
+            if (job.minute < minute) {
+                job.hour = (hour + 1) % 24;
+            }
+        }
+
+        // Base case is runs today
         std::string day = " today ";
-        if (job.hour != 24) {
-            if (job.hour < hour) {
-                if (job.minute == 60) {
-                    job.minute = 0;
-                }
-                day = " tomorrow ";
-            } else if (job.hour > hour) {
-                if (job.minute == 60) {
-                    job.minute = 0;
-                }
-            } else {
-                if (job.minute == 60) {
-                    job.minute = minute;
-                }
-                if (job.minute < minute) {
-                    day = " tomorrow ";
-                }
+
+        // Handles different timing cases
+        if (job.hour < hour) {
+            // If every minute -> run in the first minute
+            if (job.minute == 60) {
+                job.minute = 0;
+            }
+            day = " tomorrow ";
+        } else if (job.hour > hour) {
+            // If every minute -> run in the first minute
+            if (job.minute == 60) {
+                job.minute = 0;
             }
         } else {
+            // If every minute -> run this minute
             if (job.minute == 60) {
                 job.minute = minute;
             }
             if (job.minute < minute) {
-                job.hour = hour + 1;
-                if (job.hour == 24) {
-                    job.hour = 0;
-                    day = " tomorrow ";
-                }
-            } else {
-                job.hour = hour;
+                day = " tomorrow ";
             }
         }
         // Outputs the next time the job will run

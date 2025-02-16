@@ -1,0 +1,7 @@
+0 0 /bin/run_me_midnight
+30 23 /bin/run_me_late
+
+23:45
+
+0:00 tomorrow - /bin/run_me_midnight
+23:30 tomorrow - /bin/run_me_late

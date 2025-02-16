@@ -1,0 +1,9 @@
+15 10 /bin/task1
+45 23 /bin/task2
+* 0 /bin/task3
+
+23:50
+
+10:15 tomorrow - /bin/task1
+23:45 tomorrow - /bin/task2
+0:00 tomorrow - /bin/task3

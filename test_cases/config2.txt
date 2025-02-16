@@ -1,0 +1,7 @@
+30 14 /bin/run_me_exact
+* * /bin/run_me_every_minute
+
+14:30
+
+14:30 today - /bin/run_me_exact
+14:30 today - /bin/run_me_every_minute

@@ -1,0 +1,5 @@
+* 12 /bin/task_noon
+
+12:30
+
+12:30 today - /bin/task_noon

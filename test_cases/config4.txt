@@ -1,0 +1,5 @@
+30 * /bin/run_me_hourly
+
+00:31
+
+1:30 today - /bin/run_me_hourly
